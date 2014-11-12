@@ -48,6 +48,7 @@ def audiojackresponder(someeventstring):
         elif (someeventstring.startswith("button/mute MUTE")):
                 if (voluman!=None):
                         voluman.setvolume(volume)
+                        
 if __name__=='__main__':
         ajeh = AudioJackEventHAndler()
         ajeh.subscribe(audiojackresponder)
