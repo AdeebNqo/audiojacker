@@ -33,24 +33,28 @@ volume = 0
 voluman = None
 #method to be called with the events
 def audiojackresponder(someeventstring):
-        if (someventstring=="jack/headphone HEADPHONE unplug"):
+        someeventstring = someeventstring.rstrip()
+        print(someeventstring)
+        global volume
+        if (someeventstring=="jack/headphone HEADPHONE unplug"):
                 if (voluman!=None):
-                        currVolume = voluman.getvolume()
+                        currVolume = int(voluman.getvolume()[0])
                         if (currVolume!=0):
-                                global volume
                                 volume = currVolume
                                 voluman.setvolume(0)
-        elif (someventstring=="jack/headphone HEADPHONE plug"):
+        elif (someeventstring=="jack/headphone HEADPHONE plug"):
                 if (voluman!=None):
-                        voluman.set
+                        voluman.setvolume(volume)
+        elif (someeventstring.startswith("button/mute MUTE")):
+                if (voluman!=None):
+                        voluman.setvolume(volume)
 if __name__=='__main__':
         ajeh = AudioJackEventHAndler()
-        ajeh.subscribe(test)
+        ajeh.subscribe(audiojackresponder)
         ajeh.start()
 
-        global voluman
         voluman = alsaaudio.Mixer()
-        global volume
-        volume = voluman.getvolume()
+        volume = int(voluman.getvolume()[0])
+
         while True:
                 pass
