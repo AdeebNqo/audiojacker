@@ -3,7 +3,9 @@ import select
 import subprocess
 import alsaaudio
 
-class AudioJackEventHAndler(object):
+#
+#Class listens for audiojack events
+class AudioJackEventHandler(object):
         def __init__(self):
                 self.subscribers = []
         def subscribe(self,somefunction):
@@ -28,7 +30,36 @@ class AudioJackEventHAndler(object):
         def notify(self,someevent):
                 for sub in self.subscribers:
                         sub(someevent)
-
+#
+#Class listens for .. events
+class ComputerStateEventHandler(object):
+        def __init__(self):
+                self.s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                self.s.connect("/var/run/acpid.socket")
+                print "Connected to acpid"
+        def start(self):
+                t = threading.Thread(target=self.reallystart)
+                t.daemon = True
+                t.start()
+        def reallystart(self):
+                while 1:
+                    for event in s.recv(4096).split('\n'):
+                        event=event.split(' ')
+                        if len(event)<2: continue
+                        #print event
+                        #if event[0]=='ac_adapter':
+                        #    if event[3]=='00000001': #plugged
+                        #        print('power plugged in')
+                        #    else: #unplugged
+                        #        print('power unplugged')
+                        #elif event[0]=='button/power':
+                        #    print('power button pressed')
+                        if event[0]=='button/lid':
+                            if event[2]=='open':
+                                print('lid open')
+                            elif event[2]=='close':
+                                lid_close() #Laptop lid closed
+                                print('lid closed')
 volume = 0
 voluman = None
 #method to be called with the events
@@ -48,9 +79,8 @@ def audiojackresponder(someeventstring):
         elif (someeventstring.startswith("button/mute MUTE")):
                 if (voluman!=None):
                         voluman.setvolume(volume)
-                        
 if __name__=='__main__':
-        ajeh = AudioJackEventHAndler()
+        ajeh = AudioJackEventHandler()
         ajeh.subscribe(audiojackresponder)
         ajeh.start()
 
