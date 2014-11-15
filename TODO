@@ -1,4 +1,5 @@
 1. Package for Linux Ubuntu
 2. Mute when computer is powered back from sleep [DONE]
-3. Deamonize
-3.1 Add command line arguments
+3. Deamonize[Done]
+3.1 Add command line arguments[DONE]
+4. Add icon in indicator panel
