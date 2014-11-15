@@ -6,6 +6,10 @@ import socket
 import pynotify
 
 import gtk
+from daemon import Daemon as d
+import time
+import sys
+
 #
 #Class listens for audiojack events
 class AudioJackEventHandler(object):
@@ -119,17 +123,45 @@ def computerlidresponder(someeventstring):
                 notif.add_action("ignore","Yes", changestate_cb)
 		notif.show()
                 gtk.main()
+
+#
+#AudioJack daemon
+class AudioJack(d):
+        def run(self):
+
+                title = "audiojack notice"
+                msg = "audio jack has been started"
+                pynotify.init(title)
+                notif = pynotify.Notification(title, msg, )
+                notif.set_urgency(pynotify.URGENCY_CRITICAL)
+                notif.show()
+
+                ajeh = AudioJackEventHandler()
+                ajeh.subscribe(audiojackresponder)
+                ajeh.start()
+
+                voluman = alsaaudio.Mixer()
+                volume = int(voluman.getvolume()[0])
+
+                cseh = ComputerStateEventHandler()
+                cseh.subscribe(computerlidresponder)
+                cseh.start()
+
+                while True:
+                        time.sleep(1)
 if __name__=='__main__':
-        ajeh = AudioJackEventHandler()
-        ajeh.subscribe(audiojackresponder)
-        ajeh.start()
-
-        voluman = alsaaudio.Mixer()
-        volume = int(voluman.getvolume()[0])
-
-        cseh = ComputerStateEventHandler()
-        cseh.subscribe(computerlidresponder)
-        cseh.start()
-
-        while True:
-                pass
+        daemonaudiojack = AudioJack('/tmp/audiojacker.pid')
+        if len(sys.argv) == 2:
+                if 'start' == sys.argv[1]:
+                        daemonaudiojack.start()
+                elif 'stop' == sys.argv[1]:
+                        daemonaudiojack.stop()
+                elif 'restart' == sys.argv[1]:
+                        daemonaudiojack.restart()
+                else:
+                        print "Unknown command"
+                        sys.exit(2)
+                sys.exit(0)
+        else:
+                print "usage: %s start|stop|restart" % sys.argv[0]
+                sys.exit(2)
