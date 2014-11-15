@@ -131,7 +131,7 @@ class AudioJack(d):
         def run(self):
                 global voluman
                 global volume
-                
+
                 ajeh = AudioJackEventHandler()
                 ajeh.subscribe(audiojackresponder)
                 ajeh.start()

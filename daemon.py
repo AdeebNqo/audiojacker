@@ -89,10 +89,8 @@ class Daemon(object):
                 se = file(self.stderr, 'a+', 0)
             else:
                 se = so
-            print('before os.dup')
             os.dup2(si.fileno(), sys.stdin.fileno())
             os.dup2(so.fileno(), sys.stdout.fileno())
-            print('after os.dup')
             os.dup2(se.fileno(), sys.stderr.fileno())
 
         def sigtermhandler(signum, frame):
@@ -136,9 +134,7 @@ class Daemon(object):
             sys.exit(1)
 
         # Start the daemon
-        print('before daemonize')
         self.daemonize()
-        print('after daemonize')
         self.run(*args, **kwargs)
 
     def stop(self):
