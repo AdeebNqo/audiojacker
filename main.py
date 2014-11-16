@@ -9,6 +9,7 @@ import gtk
 from daemon import Daemon as d
 import time
 import sys
+import traceback
 
 #
 #Class listens for audiojack events
@@ -145,10 +146,67 @@ class AudioJack(d):
 
                 while True:
                         pass
+
+#
+#Control in indicator panel
+class IndicatorPanelControl(object):
+        def __init__(self):
+                try:
+                        import gobject
+                        import gtk
+                        import appindicator
+                        import sys
+
+                        ind = appindicator.Indicator ("example-simple-client","indicator-messages",
+                                                        appindicator.CATEGORY_APPLICATION_STATUS)
+
+                        ind.set_status (appindicator.STATUS_ACTIVE)
+                        ind.set_attention_icon ("indicator-messages-new")
+
+                        # create a menu
+                        menu = gtk.Menu()
+
+                        # create some drop down options
+
+                        optionName = "Menu Option - 1"
+                        menu_items = gtk.MenuItem(optionName)
+                        menu.append(menu_items)
+                        menu_items.connect("activate", self.menuitem_response, optionName)
+                        menu_items.show()
+
+                        optionName = "Menu Option - 2"
+                        menu_items = gtk.MenuItem(optionName)
+                        menu.append(menu_items)
+                        menu_items.connect("activate", self.menuitem_response, optionName)
+                        menu_items.show()
+
+                        optionName = "Quit"
+                        menu_items = gtk.MenuItem(optionName)
+                        menu.append(menu_items)
+                        menu_items.connect("activate", self.quitApplication, optionName)
+                        menu_items.show()
+
+                        ind.set_menu(menu)
+                        gtk.main()
+                except Exception:
+                        traceback.print_exc()
+        def menuitem_response(self,w, optionName):
+                print optionName
+        def quitApplication(self,w, optionName):
+                daemonaudiojack.stop()
+                sys.exit(0)
+
+daemonaudiojack = None
+
+def IndicatorPanelWorker():
+        ipc = IndicatorPanelControl()
 if __name__=='__main__':
         daemonaudiojack = AudioJack('/tmp/audiojacker.pid')
         if len(sys.argv) == 2:
                 if 'start' == sys.argv[1]:
+                        ipwt = threading.Thread(target=IndicatorPanelWorker)
+                        ipwt.daemon = True
+                        ipwt.start()
                         daemonaudiojack.start()
                 elif 'stop' == sys.argv[1]:
                         daemonaudiojack.stop()
