@@ -3,7 +3,9 @@ import select
 import subprocess
 import alsaaudio
 import socket
-import pynotify
+
+from gi.repository import Notify
+from gi.repository import GObject
 
 import gtk
 from daemon import Daemon as d
@@ -11,14 +13,15 @@ import time
 import sys
 import traceback
 
-import gobject
-import gtk
-import appindicator
-
 import subprocess
 
-import logging
-logging.basicConfig(filename='audiojackermsgs.log',level=logging.DEBUG)
+from time import gmtime, strftime, sleep
+
+logstatus = True
+
+if (logstatus):
+        import logging
+        logging.basicConfig(filename='audiojackermsgs.log',level=logging.DEBUG)
 
 #volume
 currVolume = 0
@@ -103,14 +106,27 @@ def audiojackresponder(someeventstring):
 
         someeventstring = someeventstring.rstrip()
         if (someeventstring=="jack/headphone HEADPHONE unplug"):
-                print('audiojackresponder1.5: current volume is {}'.format(currVolume))
                 setsoundlevel('0%')
         elif (someeventstring=="jack/headphone HEADPHONE plug"):
-                print('set sound back')
                 setsoundlevel(currVolume)
         elif (someeventstring.startswith("button/mute MUTE")):
                 print('mute pressed')
-        print('audiojackresponder2: current volume is {}'.format(currVolume))
+
+class VolumeControlDialog(GObject.Object):
+    def __init__(self):
+
+        super(VolumeControlDialog, self).__init__()
+        self.app_name = "audiojacker"
+        self.title = "audio status"
+        self.text = "Hello World"
+        self.icon_path = "/usr/share/icons/HighContrast/22x22/apps/firefox.png"
+        # lets initialise with the application name
+        Notify.init(self.app_name)
+
+
+    def send_notification(self):
+        n = Notify.Notification.new(self.title, self.text, self.icon_path)
+        n.show()
 
 
 # method for changing audio state back to what it was
@@ -121,13 +137,10 @@ def changestate_cb(n, action):
 def donotchangestate_cb(n, action):
         assert action == "ignore"
         gtk.main_quit()
-#method to be called with the events of the computer lid
-def computerlidresponder(someeventstring):
-        if (someeventstring=='lid closed'):
-                setsoundlevel('0%')
-        elif (someeventstring=='lid open'):
-                logging.debug('lid open response called!')
 
+import pynotify
+def askunmute():
+        try:
                 title = "audiojacker"
                 msg = "Audio was open muted on lid close. unmute?"
                 pynotify.init(title)
@@ -137,6 +150,61 @@ def computerlidresponder(someeventstring):
                 notif.add_action("ignore","Yes", changestate_cb)
                 notif.show()
                 gtk.main()
+        except Exception, e:
+                if (logstatus):
+                        logging.exception(e)
+
+import dbus
+import dbus.glib
+
+detectunlockloop = None
+
+def screen_unlock_callback(state):
+        if (logstatus):
+                logging.debug('{0}-screen unlock callback called!! state is {1}'.format(strftime("%Y-%m-%d %H:%M:%S"), state))
+        if (state==1):
+                if (logstatus):
+                        logging.debug('{0}-about to call unmute'.format(strftime("%Y-%m-%d %H:%M:%S")))
+                detectunlockloop.quit()
+
+                #my = VolumeControlDialog()
+                #my.send_notification()
+                #askunmute()
+                sleep(15)
+                askunmute()
+                #setsoundlevel("60%")
+                #import os
+                #os.system('vlc \"/home/adeeb/Downloads/J. Cole - Roll Call.mp3\"')
+
+                if (logstatus):
+                        logging.debug('{0}-called unmute'.format(strftime("%Y-%m-%d %H:%M:%S")))
+
+#method to be called with the events of the computer lid
+def computerlidresponder(someeventstring):
+        if (someeventstring=='lid closed'):
+                setsoundlevel('0%')
+        elif (someeventstring=='lid open'):
+                if (logstatus):
+                        logging.debug('{}-lid open response called!'.format(strftime("%Y-%m-%d %H:%M:%S")))
+                try:
+                        if (logstatus):
+                                logging.debug('{}-about to start dbus service!'.format(strftime("%Y-%m-%d %H:%M:%S")))
+
+                        session_bus = dbus.SessionBus()
+                        session_bus.add_signal_receiver(screen_unlock_callback,'ActiveChanged','org.gnome.ScreenSaver')
+
+                        import gobject
+                        global detectunlockloop
+                        detectunlockloop = gobject.MainLoop()
+                        detectunlockloop.run()
+
+                        if (logstatus):
+                                logging.debug('{}-about to start dbus loop!'.format(strftime("%Y-%m-%d %H:%M:%S")))
+                                logging.debug('{}-finished dbus loop!'.format(strftime("%Y-%m-%d %H:%M:%S")))
+
+                except Exception, e:
+                        if (logstatus):
+                                logging.exception(e)
 #
 #AudioJack daemon
 class AudioJack(d):
