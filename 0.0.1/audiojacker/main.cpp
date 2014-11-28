@@ -8,7 +8,7 @@ int main()
 {
     controlcenter controller;
      cout << "0.Hello world!" << endl;
-    headsetevents<controlcenter> events;
+    headsetevents events;
      cout << "1.Hello world!" << endl;
     events.registerlistener(controller);
      cout << "2.Hello world!" << endl;

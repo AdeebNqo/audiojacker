@@ -7,6 +7,7 @@ class controlcenter
     public:
         controlcenter();
         virtual ~controlcenter();
+        bool operator==(const controlcenter);
         void audiojack_connect();
         void audiojack_disconnect();
         void volume_update(std::string volume);

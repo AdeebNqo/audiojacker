@@ -9,12 +9,15 @@ controlcenter::~controlcenter()
 {
     //dtor
 }
-void audiojack_connect(){
-    std::cout << "audio jack has been connected." << std::endl;
+bool controlcenter::operator==(const controlcenter){
+    return true;
 }
-void audiojack_disconnect(){
+void controlcenter::audiojack_connect(){
+
+}
+void controlcenter::audiojack_disconnect(){
     std::cout << "audio jack has been disconnected." << std::endl;
 }
-void volume_update(std::string volume){
+void controlcenter::volume_update(std::string volume){
     std::cout << "volume has been updated to "<< volume << std::endl;
 }

@@ -1,10 +1,10 @@
 # depslib dependency file v1.0
-1417049835 source:/home/adeeb/Documents/programming/audiojacker/0.0.1/audiojacker/main.cpp
+1417183671 source:/home/adeeb/Documents/programming/audiojacker/0.0.1/audiojacker/main.cpp
 	<iostream>
 	"headsetjackhandler.hpp"
 	"controlcenter.hpp"
 
-1417052599 /home/adeeb/Documents/programming/audiojacker/0.0.1/audiojacker/include/headsetjackhandler.hpp
+1417187505 /home/adeeb/Documents/programming/audiojacker/0.0.1/audiojacker/include/headsetjackhandler.hpp
 	<vector>
 	<thread>
 	<cerrno>
@@ -12,10 +12,10 @@
 	"controlcenter.hpp"
 	<algorithm>
 
-1417038904 /home/adeeb/Documents/programming/audiojacker/0.0.1/audiojacker/include/controlcenter.hpp
+1417187489 /home/adeeb/Documents/programming/audiojacker/0.0.1/audiojacker/include/controlcenter.hpp
 	<string>
 
-1417038891 source:/home/adeeb/Documents/programming/audiojacker/0.0.1/audiojacker/src/controlcenter.cpp
+1417187485 source:/home/adeeb/Documents/programming/audiojacker/0.0.1/audiojacker/src/controlcenter.cpp
 	"controlcenter.hpp"
 	<iostream>
 

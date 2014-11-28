@@ -17,7 +17,6 @@
  */
 
 namespace audiojacker{
-template <typename ListenerType>
 class headsetevents{
   public:
     headsetevents(){
@@ -71,9 +70,19 @@ class headsetevents{
                             }
                             else if(buffstring.compare(0, headplug.length(), headplug) == 0){
                                     //audiojack_connect()
+                                    auto it = listeners.begin();
+                                    auto endP = listeners.end();
+                                    for (; it!=endP; ++it){
+                                        it->audiojack_connect();
+                                    }
                             }
                             else if(buffstring.compare(0, headunplug.length(), headunplug) == 0){
                                     //void audiojack_disconnect()
+                                    auto it = listeners.begin();
+                                    auto endP = listeners.end();
+                                    for (; it!=endP; ++it){
+                                        it->audiojack_disconnect();
+                                    }
                             }
                             else if(buffstring.compare(0, micplug.length(), micplug) == 0){
 
@@ -107,14 +116,14 @@ class headsetevents{
      * 3. void volume_update(string volume)
      *
      */
-    void registerlistener(ListenerType listener){
+    void registerlistener(controlcenter listener){
         listeners.push_back(listener);
     }
-    void unregisterlistener(ListenerType listener){
+    void unregisterlistener(controlcenter listener){
         listeners.erase(std::find(listeners.begin(), listeners.end(), listener));
     }
 
-    std::vector<ListenerType> listeners; //list of objects which have subscribed to the event handler.
+    std::vector<controlcenter> listeners; //list of objects which have subscribed to the event handler.
 
    private:
     bool activated = true;
