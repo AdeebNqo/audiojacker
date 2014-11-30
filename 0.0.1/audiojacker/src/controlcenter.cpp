@@ -1,5 +1,6 @@
 #include "controlcenter.hpp"
 #include<iostream>
+#include "volumecontroller.hpp"
 controlcenter::controlcenter()
 {
     //ctor
@@ -16,8 +17,12 @@ void controlcenter::audiojack_connect(){
 
 }
 void controlcenter::audiojack_disconnect(){
-    std::cout << "audio jack has been disconnected." << std::endl;
+    volumecontroller::togglevolume();
 }
-void controlcenter::volume_update(std::string volume){
-    std::cout << "volume has been updated to "<< volume << std::endl;
+
+void controlcenter::lid_open(){
+    volumecontroller::togglevolume();
+}
+void controlcenter::lid_close(){
+    volumecontroller::togglevolume();
 }

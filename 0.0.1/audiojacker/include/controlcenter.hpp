@@ -10,7 +10,8 @@ class controlcenter
         bool operator==(const controlcenter);
         void audiojack_connect();
         void audiojack_disconnect();
-        void volume_update(std::string volume);
+        void lid_open();
+        void lid_close();
     protected:
     private:
 };
